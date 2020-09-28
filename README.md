@@ -19,3 +19,5 @@ Hardware Requirements
 10 Jumper Cables
 
 image of all the components is available in master branch
+
+you are suppose to do the connnection as per the code
