@@ -1,0 +1,136 @@
+#include<SoftwareSerial.h>
+#include<Servo.h>
+int rm1=12;
+int rm2=13;
+int lm1=8;
+int lm2=9;
+int obst=2;
+int ls=A0;
+int ms=A1;
+int rs=A2;
+int rfx=10;
+int tfx=11;
+int pump1=4;
+int pump2=5;
+Servo S;
+int pos=0;
+SoftwareSerial BTSerial(rfx,tfx);
+
+void setup() 
+{
+	S.attach(6);
+	pinMode(lm1,OUTPUT);
+	pinMode(lm2,OUTPUT);
+	pinMode(rm1,OUTPUT);
+	pinMode(rm2,OUTPUT);
+	pinMode(ls,INPUT);
+	pinMode(ms,INPUT);
+	pinMode(rs,INPUT);
+	pinMode(pump1,OUTPUT);
+	pinMode(pump2,OUTPUT);
+	pinMode (obst,INPUT);
+	BTSerial.flush();
+	BTSerial.begin(9600);
+	Serial.begin(9600);
+}
+
+void loop() {
+	int pos=0,i;
+	int v1=analogRead(ls);
+	int v2=analogRead(ms);
+	int v3=analogRead(rs);
+	int dobst=digitalRead(obst);
+	Serial.println(dobst);
+	if(dobst!=1)
+	{
+		BTSerial.write("0");
+		S.detach();
+	if(v1<600)//left sensor
+	{
+		if(dobst==0)
+		{
+			Serial.println(v1);
+			digitalWrite(lm1,1);
+			digitalWrite(lm2,0);
+		}
+		else
+		{
+			digitalWrite(lm1,0);
+			digitalWrite(lm2,0);
+		}
+	}
+	else if(v2<600) //middle sensor
+	{
+		if(dobst==0)
+		{	
+			Serial.println(v2);
+			BTSerial.write("0");
+			digitalWrite(lm1,1);
+			digitalWrite(lm2,0);
+			digitalWrite(rm1,1);
+			digitalWrite(rm2,0);
+		}
+		else
+		{
+			digitalWrite(lm1,1);
+			digitalWrite(lm2,0);
+			digitalWrite(rm1,1);
+			digitalWrite(rm2,0);
+		}
+	}
+	else if(v3<600)
+		//right sensor
+	{
+		if(dobst==0)
+		{
+			Serial.println(v3);
+			Serial.println("hello");
+			BTSerial.write("0");
+			digitalWrite(rm1,1);
+			digitalWrite(rm2,0);
+		}
+	}
+	else
+	{
+		Serial.println(v1);
+		BTSerial.write("1");
+		digitalWrite(lm1,0);
+		digitalWrite(lm2,0);
+		digitalWrite(rm1,0);
+		digitalWrite(rm2,0);
+
+	}
+	}
+	else
+	{
+		digitalWrite(lm1,0);
+		digitalWrite(lm2,0);
+		digitalWrite(rm1,0);
+		digitalWrite(rm2,0);
+	if(analogRead(v1)<600 || analogRead(v2)<600 || analogRead(v3)<600)
+	{
+		digitalWrite(pump1,1);
+		digitalWrite(pump2,0);
+		S.attach(6);
+
+	for(int i=0;i<2;i++)
+	{
+		//digitalWrite(pump,1);
+		for(pos=0;pos<200;pos++)
+		{
+			S.write(pos);
+			delay(5);
+		}
+	for(pos=180;pos>0;pos--)
+	{
+		S.write(pos);
+		delay(5);
+	}
+	}
+	digitalWrite(pump1,0);
+	digitalWrite(pump2,0);
+	}
+}
+}
+
+
